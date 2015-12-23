@@ -26,6 +26,11 @@
   		    <script type="text/javascript" src="../js/gsap/TweenMax.min.js"></script>
           <script type="text/javascript" src="../js/Stats.js"></script>
           <script type="text/javascript">
+          /**
+      	 * Rahul Singh
+      	 * http://raulsi.in/experiments/
+      	 * http://raulsi.github.io/
+      	 */
           function loadthreex(){
             if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
@@ -42,10 +47,10 @@
             animate();
             function createCurve(X,Y,xRadius,yRadius,aStartAngle,aEndAngle,aClockwise,color,ocolor,lineWidth,spacePoints,opacity,name){
                 var curve = new THREE.EllipseCurve(
-                    0, 0,             // ax, aY
-                    xRadius, yRadius,            // xRadius, yRadius
-                    aStartAngle, aEndAngle, // aStartAngle, aEndAngle
-                    aClockwise             // aClockwise
+                    0, 0, 
+                    xRadius, yRadius,
+                    aStartAngle, aEndAngle,
+                    aClockwise
                 );
 
                 var points = curve.getSpacedPoints( spacePoints );
