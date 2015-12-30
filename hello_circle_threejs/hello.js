@@ -4,7 +4,6 @@
 * http://raulsi.github.io/
 */
 function loadthreeexp(){
-  if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
   var container, stats;
   var camera, scene, renderer, particles, geometry, materials = [], parameters, i, h, color, size, particle;
@@ -66,8 +65,6 @@ function loadthreeexp(){
       scene.add(line);
   }
   function init() {
-    if ( ! Detector.webgl )
-            Detector.addGetWebGLMessage();
     camera =  new THREE.OrthographicCamera(window.innerWidth / - 2, window.innerWidth / 2,window.innerHeight / 2, window.innerHeight / - 2, 1, 2000 );
     camera.position.z = 1000;
 
