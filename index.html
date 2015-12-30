@@ -1,29 +1,78 @@
 
-
+</html>
 <head>
   <title>raulsi.github.io</title>
   <link rel="shortcut icon" href="images/raulsi.png">
 <style>
+body{
+  background-color: #eeeeee;
+}
   #container{
     width: 80vw;
     position: absolute;
     left: 10vh;
   }
+  .secrow{
+  	width: 100%;
+  	border-bottom: 1px solid rgba(0, 0, 0, 0.3);
+  }
+  .sechead{
+  	margin: 1%;
+  	padding: 1%;
+  }
+  .seccontent{
+  	overflow: hidden;
+  }
+  .expspan{
+  	width: 17%;
+  	float: left;
+  	height: 12vh;
+  	margin: 1.5%;
+  }
+  .expimg{
+  	height: 80%;
+  	box-shadow: 1px 2px 2px rgba(0, 0, 0, 0.5);
+  }
+  .thumbnail{
+  		color: #323232;
+  		text-decoration: none;
+  }
 </style>
 </head>
+<body>
 <div  id="container">
 <h2><a href="http://raulsi.github.io/">raulsi.github.io<a></h2>
-<h3>Experiments:</h3>
+  <hr>
+<div class="secrow" id="experiments">
+    <div class="sechead">
+    <center><span>Experiments</span></center>
+      <center><span>.....</span></center>
+    </div>
+    <div class="seccontent">
+      <div class="expspan ">
+        <a href="./experiments/hello_circle_threejs" class="thumbnail">
+          <center style="height:100%;">
+            <img src="./images/hellocircle.png" class="expimg"/><br>
+            <span class="caption">Hello Example</span>
+          </center>
+        </a>
+      </div>
+      <div class="expspan ">
+        <a href="./experiments/simple_loader_threejs" class="thumbnail">
+          <center style="height:100%;">
+            <img src="./images/simpleloader.png" class="expimg"/><br>
+            <span class="caption">Simple Loader</span>
+          </center>
+        </a>
+      </div>
+    </div>
 
-<hr>
-
-<div id="experiments">
-  <a href="hello_circle_threejs">hello_circle_threejs</a><br>
-  <a href="simple_loader_threejs">simple_loader_threejs</a><br>
 </div>
-<hr>
 <div id="footer">
   <h5><a href="http://raulsi.in/">raulsi.in<a></h5>
   <h5><a href="mailto:raulsi07@gmail.com">raulsi07@gmail.com<a></h5>
 </div>
 </div>
+</body>
+
+</html>
