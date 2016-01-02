@@ -16,36 +16,7 @@ function loadthreeexp(){
 
   init();
   animate();
-  function createCurve(X,Y,xRadius,yRadius,aStartAngle,aEndAngle,aClockwise,color,ocolor,lineWidth,spacePoints,opacity,name){
-      var curve = new THREE.EllipseCurve(
-          0, 0,
-          xRadius, yRadius,
-          aStartAngle, aEndAngle,
-          aClockwise
-      );
 
-      var points = curve.getSpacedPoints( spacePoints );
-
-      var path = new THREE.Path();
-      var geometry = path.createGeometry( points );
-
-      var material = new THREE.LineBasicMaterial( { color : color ,linewidth: lineWidth,opacity:opacity} );
-
-      var line = new THREE.Line( geometry, material );
-      line.position.set( X, Y, 0 );
-      line.name=name || "curvecollection";
-      var initial = new THREE.Color(line.material.color.getHex());
-      var value = new THREE.Color(ocolor);
-      TweenMax.to(initial, 5, {     //This syntax is relevant to GSAP's TweenLite, I'll provide a link to the docs
-            r: value.r,
-            g: value.g,
-            b: value.b,
-            ease: Cubic.easeInOut,repeat:-1, yoyo:true,
-            onUpdate: function() { line.material.color = initial; }
-      });
-
-      scene.add(line);
-  }
   function createLine(vec,xRadius,yRadius,color,ocolor,lineWidth,spacePoints,opacity,name){
       var geometry = new THREE.Geometry();
       geometry.vertices=vec;
@@ -65,13 +36,15 @@ function loadthreeexp(){
       scene.add(line);
   }
   function init() {
-    camera =  new THREE.OrthographicCamera(window.innerWidth / - 2, window.innerWidth / 2,window.innerHeight / 2, window.innerHeight / - 2, 1, 2000 );
-    camera.position.z = 1000;
-
+    camera =  new THREE.OrthographicCamera(window.innerWidth / - 2, window.innerWidth / 2,window.innerHeight / 2, window.innerHeight / - 2, 1, 20000 );
+    camera.position.z = 15000;
+    if ( Detector.webgl )
+    		renderer = new THREE.WebGLRenderer( {antialias:true} );
+    else
+    	  renderer = new THREE.CanvasRenderer();
     scene = new THREE.Scene();
     scene.fog = new THREE.FogExp2( 0x000000, 0.0007 );
     scene.add(camera);
-    renderer = new THREE.CanvasRenderer();
     renderer.setPixelRatio( window.devicePixelRatio );
     renderer.setSize( window.innerWidth, window.innerHeight  );
     document.body.appendChild( renderer.domElement );
@@ -80,29 +53,13 @@ function loadthreeexp(){
     aspratio=cWidth/cHeight;
     colorarray=['#d3d3d3','#bdbdbd','#a8a8a8','#939393','#7e7e7e','#696969','#545454','#3f3f3f','#2a2a2a','#151515']
     crad=60;
-    createCurve(-(cWidth-cWidth/6),0,crad-(crad/3),crad,Math.PI/3,-Math.PI/3,true,'#98fdf5','#5b9793',(crad/100)*5,100,0.9);
-    createCurve(-(cWidth-cWidth/6),0,crad-(crad/3),crad,(2*Math.PI)/3,(4*Math.PI)/3,false,'#98fdf5','#5b9793',(crad/100)*5,100,0.9);
-    var vec = [new THREE.Vector3( -(cWidth-cWidth/6)-(crad/3), 0, 0 ),new THREE.Vector3( -(cWidth-cWidth/6)+(crad/3), 0, 0 )];
-    createLine(vec,crad-(crad/3),crad,'#98fdf5','#5b9793',(crad/100)*5,100,0.9);
-    createCurve(-cWidth/2,0,crad-(crad/3),crad,(2*Math.PI)/3,(4*Math.PI)/3,false,'#777777','#474747',(crad/100)*5,100,0.9);
-    var vec = [new THREE.Vector3( -cWidth/2-(crad/3), 0, 0 ),new THREE.Vector3( -cWidth/2+(crad/3), 0, 0 )];
-    createLine(vec,crad-(crad/3),crad,'#777777','#474747',(crad/100)*5,100,0.9);
-    var vec = [new THREE.Vector3( -cWidth/2-(crad/3), (crad/3)*2, 0 ),new THREE.Vector3( -cWidth/2+(crad/3), (crad/3)*2, 0 )];
-    createLine(vec,crad-(crad/3),crad,'#777777','#474747',(crad/100)*5,100,0.9);
-    var vec = [new THREE.Vector3( -cWidth/2-(crad/3), -(crad/3)*2, 0 ),new THREE.Vector3( -cWidth/2+(crad/3), -(crad/3)*2, 0 )];
-    createLine(vec,crad-(crad/3),crad,'#777777','#474747',(crad/100)*5,100,0.9);
-    createCurve(-cWidth/6,0,crad-(crad/3),crad,(2*Math.PI)/3,(4*Math.PI)/3,false,'#ff6a6a','#993f3f',(crad/100)*5,100,0.9);
-    var vec = [new THREE.Vector3( -cWidth/6-(crad/3), -(crad/3)*2, 0 ),new THREE.Vector3( -cWidth/6+(crad/3), -(crad/3)*2, 0 )];
-    createLine(vec,crad-(crad/3),crad,'#ff6a6a','#993f3f',(crad/100)*5,100,0.9);
-    createCurve(cWidth/6,0,crad-(crad/3),crad,(2*Math.PI)/3,(4*Math.PI)/3,false,'#00c5cd','#00767b',(crad/100)*5,100,0.9);
-    var vec = [new THREE.Vector3( (cWidth/6)-(crad/3), -(crad/3)*2, 0 ),new THREE.Vector3( (cWidth/6)+(crad/3), -(crad/3)*2, 0 )];
-    createLine(vec,crad-(crad/3),crad,'#00c5cd','#00767b',(crad/100)*5,100,0.9);
-    createCurve(cWidth/2,0,crad-(crad/4),crad-(crad/4),0,145,false,'#8400ff','#4f0099',(crad/100)*5,100,0.9);
-    createCurve(cWidth-(cWidth/4),0,crad-(crad/3),crad,Math.PI/3,(5*Math.PI)/3,true,'#f6b8ad','#936e67',(crad/100)*5,100,0.9);
-    var vec = [new THREE.Vector3( cWidth-(cWidth/4)-(crad/10), (crad/3)*2, 0 ),new THREE.Vector3( cWidth-(cWidth/4)+(crad/10), (crad/3)*2, 0 )];
-    createLine(vec,crad-(crad/3),crad,'#f6b8ad','#936e67',(crad/100)*5,100,0.9);
-    var vec = [new THREE.Vector3( cWidth-(cWidth/4)-(crad/10), -(crad/3)*2, 0 ),new THREE.Vector3( cWidth-(cWidth/4)+(crad/10), -(crad/3)*2, 0 )];
-    createLine(vec,crad-(crad/3),crad,'#f6b8ad','#936e67',(crad/100)*5,100,0.9);
+    var floorMaterial = new THREE.MeshBasicMaterial( {color:0xffffff } );
+  	var floorGeometry = new THREE.PlaneGeometry(2000, 1000, 32);
+  	var floor = new THREE.Mesh(floorGeometry, floorMaterial);
+    floor.position.y=-300;
+    floor.rotation.x = Math.PI/4;
+    floor.rotation.z = 0.2;
+  	scene.add(floor);
 
     var material = new THREE.SpriteMaterial( {
       map: new THREE.CanvasTexture( generateSprite() ),
@@ -206,6 +163,8 @@ function loadthreeexp(){
         }
         object.position.x=object.position.x + (Math.random() * ( i % (Math.random()*10) ==0  ?  1 : - 1  ))/10;
         object.position.y=object.position.y + (Math.random() * ( i % (Math.random()*10) ==0  ?  1 : - 1  ))/10;
+      }else if(object instanceof THREE.Mesh){
+        //object.rotation.x = object.rotation.x + 0.1;
       }
 
     }
