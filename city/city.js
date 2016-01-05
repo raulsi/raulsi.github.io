@@ -8,77 +8,79 @@ function loadthreeexp(){
   var container, stats;
   var camera, scene, renderer, particles, geometry, materials = [], parameters, i, h, color, size, particle;
   var mouseX = 0, mouseY = 0;
-  var sky, sunSphere, ms_Ocean;
   var lastTime = (new Date()).getTime();
   var cWidth=0;
   var cHeight=0;
+  var group;
+  var groups=Array();
+  var onanime=0;
   var curverspeed=0.0003;
   var windowHalfX = window.innerWidth / 2;
   var windowHalfY = window.innerHeight / 2;
+  var parameters = {
+				width: 2000,
+				height: 2000,
+				widthSegments: 250,
+				heightSegments: 250,
+				depth: 1500,
+				param: 4,
+				filterparam: 1
+			};
 
+	var waterNormals;
+  var water;
   init();
   animate();
-  /* borrowed code from three js example */
-  function initSky() {
+  function createbox(X,Y,Z,j){
+    var particles = 10;
 
-    // Add Sky Mesh
-    sky = new THREE.Sky();
-    scene.add( sky.mesh );
+    var geometry = new THREE.BufferGeometry();
 
-    // Add Sun Helper
-    sunSphere = new THREE.Mesh(
-      new THREE.SphereBufferGeometry( 20000, 16, 8 ),
-      new THREE.MeshBasicMaterial( { color: 0xffffff } )
-    );
-    sunSphere.position.y = - 700000;
-    sunSphere.visible = false;
-    scene.add( sunSphere );
+    var positions = new Float32Array( particles * 3 );
+    var colors = new Float32Array( particles * 3 );
 
-    /// GUI
+    var color = new THREE.Color();
 
-    var effectController  = {
-      turbidity: 10,
-      reileigh: 1,
-      mieCoefficient: 0.0054,
-      mieDirectionalG: 0.1,
-      luminance: 0.4,
-      inclination: 0.5, // elevation / inclination
-      azimuth: 0.1, // Facing front,
-      sun: ! true
-    };
+    var n = 5, n2 = n / 2; // particles spread in the cube
 
-    var distance = 400000;
+    for ( var i = 0; i < positions.length; i += 3 ) {
 
-    function guiChanged() {
+      // positions
 
-      var uniforms = sky.uniforms;
-      uniforms.turbidity.value = effectController.turbidity;
-      uniforms.reileigh.value = effectController.reileigh;
-      uniforms.luminance.value = effectController.luminance;
-      uniforms.mieCoefficient.value = effectController.mieCoefficient;
-      uniforms.mieDirectionalG.value = effectController.mieDirectionalG;
+      var x = Math.random() * n - n2;
+      var y = Math.random() * n - n2;
+      var z = Math.random() * n - n2;
 
-      var theta = Math.PI * ( effectController.inclination - 0.5 );
-      var phi = 2 * Math.PI * ( effectController.azimuth - 0.5 );
+      positions[ i ]     = x;
+      positions[ i + 1 ] = y;
+      positions[ i + 2 ] = z;
 
-      sunSphere.position.x = distance * Math.cos( phi );
-      sunSphere.position.y = distance * Math.sin( phi ) * Math.sin( theta );
-      sunSphere.position.z = distance * Math.sin( phi ) * Math.cos( theta );
+      // colors
 
-      sunSphere.visible = effectController.sun;
+      var vx = ( x / n ) + 0.1;
+      var vy = ( y / n ) + 0.1;
+      var vz = ( z / n ) + 0.1;
 
-      sky.uniforms.sunPosition.value.copy( sunSphere.position );
+      color.setRGB( vx, vy, vz );
 
-      renderer.render( scene, camera );
+      colors[ i ]     = color.r;
+      colors[ i + 1 ] = color.r;
+      colors[ i + 2 ] = color.r;
 
     }
+    geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
+    geometry.addAttribute( 'color', new THREE.BufferAttribute( colors, 3 ) );
 
-    guiChanged();
+    geometry.computeBoundingSphere();
 
+    //
 
-	}
-
-  /* borrowed code end */
+    var material = new THREE.PointsMaterial( { size: 100, vertexColors: THREE.VertexColors } );
+    var cubeGeometry = new THREE.CubeGeometry( 5, 5, 5, 2, 2, 2 );
+    particleSystem = new THREE.Points( geometry, material );
+    particleSystem.position.set(X,Y,Z);
+    group.add( particleSystem );
+  }
 
   function createLine(vec,xRadius,yRadius,color,ocolor,lineWidth,spacePoints,opacity,name){
       var geometry = new THREE.Geometry();
@@ -99,8 +101,8 @@ function loadthreeexp(){
       scene.add(line);
   }
   function init() {
-    camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 100, 2000000 );
-		camera.position.set( 0, 100, 2000 );
+    camera = new THREE.PerspectiveCamera( 55, window.innerWidth / window.innerHeight, 0.5, 3000000 );
+		camera.position.set( 0, 200, 2000 );
     if ( Detector.webgl )
     		renderer = new THREE.WebGLRenderer( {antialias:true} );
     else
@@ -120,8 +122,101 @@ function loadthreeexp(){
     //controls.maxPolarAngle = Math.PI / 2;
     controls.enableZoom = false;
     controls.enablePan = false;
-    initSky();
+    //controls.enableRotate = false;
 
+		scene.add( new THREE.AmbientLight( 0x444444 ) );
+    var light = new THREE.DirectionalLight( 0xffffbb, 1 );
+		light.position.set( - 1, 1, - 1 );
+		scene.add( light );
+
+
+    waterNormals = new THREE.ImageUtils.loadTexture( '../images/waternormals.jpg' );
+		waterNormals.wrapS = waterNormals.wrapT = THREE.RepeatWrapping;
+		water = new THREE.Water( renderer, camera, scene, {
+			textureWidth: 512,
+			textureHeight: 512,
+			waterNormals: waterNormals,
+			alpha: 	1.0,
+			sunDirection: light.position.clone().normalize(),
+			sunColor: 0xffffff,
+			waterColor: 0x001e0f,
+			distortionScale: 50.0,
+		} );
+
+
+		mirrorMesh = new THREE.Mesh(
+			new THREE.PlaneBufferGeometry( (parameters.width * 500), parameters.height * 500 ),
+			water.material
+		);
+		mirrorMesh.add( water );
+		mirrorMesh.rotation.x = - Math.PI * 0.5;
+    mirrorMesh.position.y=-10;
+    mirrorMesh.position.x=-(parameters.width * 500)/2;
+		scene.add( mirrorMesh );
+
+
+    var cubeMap = new THREE.CubeTexture( [] );
+		cubeMap.format = THREE.RGBFormat;
+
+		var loader = new THREE.ImageLoader();
+		loader.load( '../images/skyboxsun25degtest.png', function ( image ) {
+
+			var getSide = function ( x, y ) {
+
+  			var size = 1024;
+
+  			var canvas = document.createElement( 'canvas' );
+  			canvas.width = size;
+  			canvas.height = size;
+  			var context = canvas.getContext( '2d' );
+  			context.drawImage( image, - x * size, - y * size );
+  			return canvas;
+		    };
+
+  		cubeMap.images[ 0 ] = getSide( 2, 1 ); // px
+  		cubeMap.images[ 1 ] = getSide( 0, 1 ); // nx
+  		cubeMap.images[ 2 ] = getSide( 1, 0 ); // py
+  		cubeMap.images[ 3 ] = getSide( 1, 2 ); // ny
+  		cubeMap.images[ 4 ] = getSide( 1, 1 ); // pz
+  		cubeMap.images[ 5 ] = getSide( 3, 1 ); // nz
+  		cubeMap.needsUpdate = true;
+  	} );
+
+		var cubeShader = THREE.ShaderLib[ 'cube' ];
+		cubeShader.uniforms[ 'tCube' ].value = cubeMap;
+
+		var skyBoxMaterial = new THREE.ShaderMaterial( {
+			fragmentShader: cubeShader.fragmentShader,
+			vertexShader: cubeShader.vertexShader,
+			uniforms: cubeShader.uniforms,
+			depthWrite: false,
+			side: THREE.BackSide
+		} );
+
+		var skyBox = new THREE.Mesh(
+			new THREE.BoxGeometry( 1000000, 1000000, 1000000 ),
+			skyBoxMaterial
+		);
+
+		scene.add( skyBox );
+    for (var bi = 1; bi < 6; bi++) {
+      group= new THREE.Object3D();
+      var m = new THREE.Matrix4();
+      rd=(Math.random() * ( bi % (Math.random()*7) ==0  ?  1 : - 1  ))*10;
+      m.set(5+(bi/2),0,0,10+(bi/2),0,0,5+(bi/2),0,0,10+(bi/2),0,0);
+      group.applyMatrix(m);
+      group.updateMatrix();
+      n=100;n2=n/2;
+      for(i=0;i<1000;i++){
+              var x = Math.random() * n - n2;
+              var y = Math.random() * n - n2;
+              var z = Math.random() * n - n2;
+              createbox(x,y,z,i);
+      }
+      group.position.set(500+(bi*500),400,-10000-(rd*500));
+      scene.add(group);
+      groups.push(group);
+    }
 
     stats = new Stats();
     stats.domElement.style.position = 'absolute';
@@ -151,6 +246,27 @@ function loadthreeexp(){
 
   }
 
+  document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+
+  	function onDocumentMouseMove( event ) {
+
+  		var vector = new THREE.Vector3( event.clientX - windowHalfX, - event.clientY + windowHalfY, 0 );
+      var bbox = new THREE.Box3().setFromObject(groups[0]);
+
+      if(vector.x<bbox.max.x && vector.y<bbox.max.y && vector.x>bbox.min.x && vector.y>bbox.min.y && onanime==0){
+        onanime=1;
+        for ( var i = 0, il = groups[0].children.length; i < il; i++ ) {
+          var obj = groups[0].children[ i ];
+          TweenMax.to(obj.position, 1, { y:obj.position.y + (Math.random() * ( vector.y>0  ?  -1 : 1  ))*100,
+                  x:obj.position.x + (Math.random() * ( vector.x>0  ?  -1 : 1  ))*100,
+                ease: Cubic.easeInOut, yoyo:true,repeat:1,
+                onComplete: function() { onanime=0;}
+               });
+        }
+      }
+
+  	}
+
   function onWindowResize() {
 
     windowHalfX = window.innerWidth / 2;
@@ -178,6 +294,8 @@ function loadthreeexp(){
 
     camera.lookAt( scene.position );
     var currentTime = new Date().getTime();
+				water.material.uniforms.time.value += 1.0 / 60.0;
+				water.render();
     renderer.render( scene, camera );
   }
 
