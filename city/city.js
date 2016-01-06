@@ -13,6 +13,8 @@ function loadthreeexp(){
   var cHeight=0;
   var group;
   var groups=Array();
+  var ground=Array();
+  var grass;
   var onanime=0;
   var curverspeed=0.0003;
   var windowHalfX = window.innerWidth / 2;
@@ -32,7 +34,7 @@ function loadthreeexp(){
   init();
   animate();
   function createbox(X,Y,Z,j){
-    var particles = 10;
+    var particles = 1;
 
     var geometry = new THREE.BufferGeometry();
 
@@ -75,8 +77,8 @@ function loadthreeexp(){
 
     //
 
-    var material = new THREE.PointsMaterial( { size: 100, vertexColors: THREE.VertexColors } );
-    var cubeGeometry = new THREE.CubeGeometry( 5, 5, 5, 2, 2, 2 );
+    var material = new THREE.PointsMaterial( { size: 500, vertexColors: THREE.VertexColors } );
+    var cubeGeometry = new THREE.CubeGeometry( 2, 2, 2, 1, 1, 1 );
     particleSystem = new THREE.Points( geometry, material );
     particleSystem.position.set(X,Y,Z);
     group.add( particleSystem );
@@ -151,9 +153,42 @@ function loadthreeexp(){
 		mirrorMesh.add( water );
 		mirrorMesh.rotation.x = - Math.PI * 0.5;
     mirrorMesh.position.y=-10;
-    mirrorMesh.position.x=-(parameters.width * 500)/2;
 		scene.add( mirrorMesh );
 
+    var grassTex = THREE.ImageUtils.loadTexture('../images/concrete-cement-wall.jpg');
+    grassTex.wrapS = THREE.RepeatWrapping;
+    grassTex.wrapT = THREE.RepeatWrapping;
+    grassTex.repeat.x = 256;
+    grassTex.repeat.y = 256;
+    var groundMat = new THREE.MeshBasicMaterial({map:grassTex});
+    var groundGeo = new THREE.PlaneGeometry((parameters.width*100), (parameters.height*100));
+
+    var ground = new THREE.Mesh(groundGeo,groundMat);
+    ground.name="grouncolection";
+    ground.position.y = 10; //lower it
+    ground.rotation.x =-(Math.PI)/2; //-90 degrees around the xaxis
+    ground.rotation.z = 1.2;
+    ground.position.z=-108000;
+    //IMPORTANT, draw on both sides
+    ground.doubleSided = true;
+    scene.add(ground);
+    var grassTex = THREE.ImageUtils.loadTexture('../images/concrete-cement-wall.jpg');
+    grassTex.wrapS = THREE.RepeatWrapping;
+    grassTex.wrapT = THREE.RepeatWrapping;
+    grassTex.repeat.x = 256;
+    grassTex.repeat.y = 256;
+    var groundMat = new THREE.MeshBasicMaterial({map:grassTex});
+    var groundGeo = new THREE.PlaneGeometry((parameters.width), (parameters.height*100));
+
+    var ground = new THREE.Mesh(groundGeo,groundMat);
+    ground.name="grouncolection";
+    ground.position.y = 10; //lower it
+    ground.rotation.x =-(Math.PI)/2; //-90 degrees around the xaxis
+    ground.rotation.z = -1.40;
+    ground.position.z=2500;
+    //IMPORTANT, draw on both sides
+    ground.doubleSided = true;
+    scene.add(ground);
 
     var cubeMap = new THREE.CubeTexture( [] );
 		cubeMap.format = THREE.RGBFormat;
@@ -199,7 +234,7 @@ function loadthreeexp(){
 		);
 
 		scene.add( skyBox );
-    for (var bi = 1; bi < 6; bi++) {
+    /*for (var bi = 1; bi < 6; bi++) {
       group= new THREE.Object3D();
       var m = new THREE.Matrix4();
       rd=(Math.random() * ( bi % (Math.random()*7) ==0  ?  1 : - 1  ))*10;
@@ -207,16 +242,18 @@ function loadthreeexp(){
       group.applyMatrix(m);
       group.updateMatrix();
       n=100;n2=n/2;
-      for(i=0;i<1000;i++){
+      for(i=0;i<500;i++){
               var x = Math.random() * n - n2;
               var y = Math.random() * n - n2;
               var z = Math.random() * n - n2;
               createbox(x,y,z,i);
       }
-      group.position.set(500+(bi*500),400,-10000-(rd*500));
+      group.position.set(500+(bi*500),400+(rd*10),-10000-(rd*500));
       scene.add(group);
       groups.push(group);
-    }
+    }*/
+
+
 
     stats = new Stats();
     stats.domElement.style.position = 'absolute';
@@ -246,7 +283,7 @@ function loadthreeexp(){
 
   }
 
-  document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+  //document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 
   	function onDocumentMouseMove( event ) {
 
