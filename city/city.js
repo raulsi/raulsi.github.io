@@ -115,7 +115,7 @@ function loadthreeexp(){
     var helper = new THREE.GridHelper( 5000, 5000 );
     helper.color1.setHex( 0xffffff );
     helper.color2.setHex( 0xffffff );
-    scene.add( helper );
+    //scene.add( helper );
     renderer.setPixelRatio( window.devicePixelRatio );
     renderer.setSize( window.innerWidth, window.innerHeight );
     document.body.appendChild( renderer.domElement );
