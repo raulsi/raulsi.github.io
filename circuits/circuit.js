@@ -82,7 +82,7 @@ function loadexp(){
     context.stroke();
     context.closePath();
 
-    context.fillStyle = "rgba(32, 32, 32, 0.05)";
+    context.fillStyle = "rgba(32, 32, 32, 0.1)";
     context.fillRect (0, 0, WIDTH, HEIGHT);
   }
 
